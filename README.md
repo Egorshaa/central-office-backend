@@ -22,6 +22,7 @@ docker compose up -d --build
 docker compose ps -a
 
 При первом запуске автоматически создается root - пользователь
+
 После запуска: http://localhost:3000/docs
 Healthcheck: http://localhost:3000/health
 
