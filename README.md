@@ -135,6 +135,8 @@ Authorization: Bearer <accessToken>
 ## Остановка
 
 - Остановить контейнеры без удаления данных:
+```
 docker compose down
 - Удалить контейнеры и все данные PostgreSQL:
+```
 docker compose down -v
