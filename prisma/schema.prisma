@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  ROOT
+  MANAGER
+}
+
+enum ActorType {
+  ADMIN
+  SHOP
+}
+
+enum TerminalStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Admin {
+  id           String           @id @default(uuid()) @db.Uuid
+  name         String           @db.VarChar(120)
+  email        String           @unique @db.VarChar(255)
+  passwordHash String           @map("password_hash") @db.VarChar(255)
+  role         AdminRole        @default(MANAGER)
+  // Every manager has NULL here; the only root has "ROOT".
+  // PostgreSQL allows multiple NULLs in a unique column, so this is a DB-level
+  // guarantee that no second root can exist.
+  rootKey      String?          @unique @map("root_key") @db.VarChar(8)
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  session      Session?
+  comments     RequestComment[]
+
+  @@index([role])
+  @@map("admins")
+}
+
+model ShopOwner {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(160)
+  email       String?  @db.VarChar(255)
+  phone       String?  @db.VarChar(40)
+  companyName String?  @map("company_name") @db.VarChar(255)
+  taxId       String?  @map("tax_id") @db.VarChar(40)
+  address     String?  @db.Text
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  shops       Shop[]
+
+  @@index([name])
+  @@index([email])
+  @@map("shop_owners")
+}
+
+model Shop {
+  id                 String              @id @default(uuid()) @db.Uuid
+  ownerId            String              @map("owner_id") @db.Uuid
+  name               String              @db.VarChar(200)
+  legalName          String?             @map("legal_name") @db.VarChar(255)
+  taxId              String?             @map("tax_id") @db.VarChar(40)
+  registrationNumber String?             @map("registration_number") @db.VarChar(80)
+  address            String              @db.Text
+  phone              String?             @db.VarChar(40)
+  email              String?             @db.VarChar(255)
+  requisites         Json?
+  login              String              @unique @db.VarChar(120)
+  passwordHash       String              @map("password_hash") @db.VarChar(255)
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  owner              ShopOwner           @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  terminals          Terminal[]
+  requests           ConnectionRequest[]
+  session            Session?
+
+  @@index([ownerId])
+  @@index([name])
+  @@map("shops")
+}
+
+model Terminal {
+  id                  String             @id @default(uuid()) @db.Uuid
+  macAddress          String             @unique @map("mac_address") @db.VarChar(17)
+  status              TerminalStatus     @default(INACTIVE)
+  lastSeenAt          DateTime?          @map("last_seen_at")
+  shopId              String             @map("shop_id") @db.Uuid
+  connectionRequestId String?            @unique @map("connection_request_id") @db.Uuid
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+  shop                Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  connectionRequest   ConnectionRequest? @relation(fields: [connectionRequestId], references: [id], onDelete: SetNull)
+
+  @@index([shopId])
+  @@index([status])
+  @@map("terminals")
+}
+
+model ConnectionRequest {
+  id          String           @id @default(uuid()) @db.Uuid
+  requestedAt DateTime         @default(now()) @map("requested_at")
+  macAddress  String           @map("mac_address") @db.VarChar(17)
+  shopId      String           @map("shop_id") @db.Uuid
+  status      RequestStatus    @default(PENDING)
+  comment     String?          @db.Text
+  decidedAt   DateTime?        @map("decided_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  shop        Shop             @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  terminal    Terminal?
+  comments    RequestComment[]
+
+  @@index([shopId])
+  @@index([status, requestedAt])
+  @@index([macAddress])
+  @@map("connection_requests")
+}
+
+model RequestComment {
+  id        String            @id @default(uuid()) @db.Uuid
+  requestId String            @map("request_id") @db.Uuid
+  authorId  String            @map("author_id") @db.Uuid
+  text      String            @db.Text
+  createdAt DateTime          @default(now()) @map("created_at")
+  request   ConnectionRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  author    Admin             @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([requestId, createdAt])
+  @@map("request_comments")
+}
+
+model Session {
+  id               String    @id @default(uuid()) @db.Uuid
+  actorType        ActorType @map("actor_type")
+  adminId          String?   @unique @map("admin_id") @db.Uuid
+  shopId           String?   @unique @map("shop_id") @db.Uuid
+  version          Int       @default(1)
+  refreshTokenHash String    @map("refresh_token_hash") @db.VarChar(64)
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  admin            Admin?    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  shop             Shop?     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@map("sessions")
+}
