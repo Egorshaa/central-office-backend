@@ -15,16 +15,16 @@
 ## Запуск
 Открыть терминал (cmd ) :
 
-docker compose up -d --build
+- docker compose up -d --build
 
 Проверка контейнеров:
 
-docker compose ps -a
+- docker compose ps -a
 
 При первом запуске автоматически создается root - пользователь
 
-После запуска: http://localhost:3000/docs
-Healthcheck: http://localhost:3000/health
+- После запуска: http://localhost:3000/docs
+- Healthcheck: http://localhost:3000/health
 
 ## Первый вход
 Локальные данные для входа:
