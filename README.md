@@ -1,3 +1,7 @@
+## Backend для админ-панели центрального офиса.
+
+## Стек: NestJS, Prisma, PostgreSQL, JWT, Docker Compose
+
 ## Что реализовано
 - авторизация администраторов по email и паролю;
 - роли ROOT и MANAGER;
