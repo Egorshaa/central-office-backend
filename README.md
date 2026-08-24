@@ -55,40 +55,40 @@
 Authorization: Bearer <accessToken>
 
 ## Авторизация
-POST /auth/login - Вход администратора
-POST /auth/shop/login - Вход магазина
-POST /auth/refresh - Обновление токенов 
-POST /auth/logout - Завершение текущей сессии
+- POST /auth/login - Вход администратора
+- POST /auth/shop/login - Вход магазина
+- POST /auth/refresh - Обновление токенов 
+- POST /auth/logout - Завершение текущей сессии
 
 ## Администраторы
-GET /admins - Получить список админов
-POST /admins - Создать менеджера
-PATCH /admins/:id/password - Изменить пароль менеджера
-DELETe /admins/:id - Удалить manager
+- GET /admins - Получить список админов
+- POST /admins - Создать менеджера
+- PATCH /admins/:id/password - Изменить пароль менеджера
+- DELETe /admins/:id - Удалить manager
 
 ## Владельцы магазинов
-GET /shops-owners - Получить список владельцев
-GET /shops-owners/:id - Получить данные конкретного владельца и его магазинов
-POST /shops-owners - Создать владельца
-PATCH /shops-owners/:id - Изменить владельца
-DELETE /shops-owners/:id - Удалить владельца (по логике, владельца удалить нельзя, если к нему привязан магазин)
+- GET /shops-owners - Получить список владельцев
+- GET /shops-owners/:id - Получить данные конкретного владельца и его магазинов
+- POST /shops-owners - Создать владельца
+- PATCH /shops-owners/:id - Изменить владельца
+- DELETE /shops-owners/:id - Удалить владельца (по логике, владельца удалить нельзя, если к нему привязан магазин)
 
 ## Магазины 
-GET /shops - Получить список магазинов
-GET /shops/:id - Получить данные конкретного магазина
-POST /shops - Создать магазин
-PATCH /shops/:id/credentials - Изменить логин и пароль магазина (после изменения логина или пароля активная сессия магазина завершается)
+- GET /shops - Получить список магазинов
+- GET /shops/:id - Получить данные конкретного магазина
+- POST /shops - Создать магазин
+- PATCH /shops/:id/credentials - Изменить логин и пароль магазина (после изменения логина или пароля активная сессия магазина завершается)
 
 ## Заявки 
-GET /requests - Получить список заявок 
-POST /requests - Создать заявку
-PATCH	/requests/:id/approve - Одобрить заявку
-PATCH	/requests/:id/reject - Отклонить заявку
-POST	/requests/:id/comment - Добавить комментарий
+- GET /requests - Получить список заявок 
+- POST /requests - Создать заявку
+- PATCH	/requests/:id/approve - Одобрить заявку
+- PATCH	/requests/:id/reject - Отклонить заявку
+- POST	/requests/:id/comment - Добавить комментарий
 
 Пример создания заявки админом:
 
-{
+- {
   "shopId": "uuid магазина",
   "macAddress": "AA:BB:CC:DD:EE:FF",
   "comment": "Подключить терминал"
@@ -97,16 +97,16 @@ POST	/requests/:id/comment - Добавить комментарий
 При одобрении заявки терминал создается автоматически о статусом INACTIVE.
 
 ## Терминалы 
-GET /terminals - Получить список терминалов
-GET	/terminals/:id - Получить данные конкретного терминала
-PATCH	/terminals/:id/status - Изменить статус вручную
-POST	/terminals/alive - Heartbeat от магазина (POST /terminals/alive вызывается с JWT магазина, терминал должен принадлежать этому магазину)
+- GET /terminals - Получить список терминалов
+- GET	/terminals/:id - Получить данные конкретного терминала
+- PATCH	/terminals/:id/status - Изменить статус вручную
+- POST	/terminals/alive - Heartbeat от магазина (POST /terminals/alive вызывается с JWT магазина, терминал должен принадлежать этому магазину)
 
 ## Профиль
-PATCH /profile/password - Смена собственного пароля
+- PATCH /profile/password - Смена собственного пароля
 Пример:
 
-{
+- {
   "currentPassword": "CurrentPassword1!",
   "newPassword": "NewPassword1!"
 }
