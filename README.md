@@ -38,7 +38,7 @@
 
 Тело запроса:
 
-{
+- {
   "email": "root@example.com",
   "password": "ChangeMe123!"
 }
